@@ -10,7 +10,6 @@ class BaseSimulationDataset(Dataset):
     C = 2
 
     def __init__(self,
-                 censored_ratio,
                  event_ratio,
                  features_dimension,
                  num_samples,
@@ -18,8 +17,6 @@ class BaseSimulationDataset(Dataset):
                  intercept=None,
                  should_sample_vector=True):
         """
-        :type censored_ratio: float
-        :param censored_ratio: Probability for a sample to be censored.
         :param event_ratio: Probability for a sample to have an event.
         :param features_dimension: Amount of features for each sample.
         :param num_samples: Amount of samples.
@@ -27,7 +24,6 @@ class BaseSimulationDataset(Dataset):
         :param should_sample_vector: Boolean to indicate if vectors should be sampled or given as parameters.
         """
         super(BaseSimulationDataset, self).__init__()
-        self.censored_ratio = censored_ratio
         self.event_ratio = event_ratio
         self.features_dimension = features_dimension
         self.num_samples = num_samples
@@ -43,6 +39,8 @@ class BaseSimulationDataset(Dataset):
         self.x = torch.zeros(self.num_samples, self.features_dimension)
         self.y = torch.zeros(self.num_samples, 4)  # [T_c_i, T_e_i, I_c_i, I_e_i]
 
+        censored_count = 0
+
         for i in range(self.num_samples):
             x_i = np.random.normal(5, 1, size=self.features_dimension)
             t_c_i = np.random.exponential(self.C)
@@ -55,11 +53,15 @@ class BaseSimulationDataset(Dataset):
                     self.y[i] = torch.tensor([0, t_e_i, 0, 1])
                     self.x[i] = torch.from_numpy(x_i.astype(np.float32).reshape(1, -1))
                 else:  # event censored
+                    censored_count += 1
                     self.y[i] = torch.tensor([t_c_i, 0, 1, 1])
                     self.x[i] = torch.from_numpy(x_i.astype(np.float32).reshape(1, -1))
             else:  # no event
+                censored_count += 1
                 self.x[i] = torch.from_numpy(x_i.astype(np.float32).reshape(1, -1))
                 self.y[i] = torch.tensor([t_c_i, 0, 1, 0])
+
+            self.censored_ratio = censored_count / num_samples
 
     @staticmethod
     def is_sample_event(y):
