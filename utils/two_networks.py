@@ -89,12 +89,12 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
             # print(t_pred)
             # print(p_pred)
             # print(outputs)
-            loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=outputs,
-                             uncensored_mean=uncensored_mean, censored_mean=censored_mean,
-                             batch_losses_first=batch_losses_first,
-                             batch_losses_second=batch_losses_second,
-                             batch_losses_third=batch_losses_third)
-            # loss = ratio.RATIO(y=outputs, y_hat=t_pred)
+            # loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=outputs,
+            #                  uncensored_mean=uncensored_mean, censored_mean=censored_mean,
+            #                  batch_losses_first=batch_losses_first,
+            #                  batch_losses_second=batch_losses_second,
+            #                  batch_losses_third=batch_losses_third)
+            loss = ratio.RATIO(y=outputs, y_hat=t_pred)
             # # print(f'loss: {loss}')
 
             # backward
