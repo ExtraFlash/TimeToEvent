@@ -14,6 +14,7 @@ from datasets.dataset_real import RealDataset as Dataset
 from models.probability_neural_network import ProbabilityNetwork
 from models.time_neural_network import TimeNetwork
 from losses.my_loss import MyLoss as Loss
+from losses.my_loss_no_sigmoid import MyLoss as LossNoSigmoid
 from lifelines.utils import concordance_index as ci_lifelines
 from losses import ratio
 
@@ -68,7 +69,8 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
     # define the model
     prob_model = ProbabilityNetwork(n_features)
     time_model = TimeNetwork(n_features)
-    criterion = Loss(coef1=coef1, coef2=coef2)
+    # criterion = Loss(coef1=coef1, coef2=coef2)
+    criterion = LossNoSigmoid(coef1=coef1, coef2=coef2)
     prob_optimizer = torch.optim.Adam(prob_model.parameters(), lr=learning_rate, weight_decay=0.001)
     time_optimizer = torch.optim.Adam(time_model.parameters(), lr=learning_rate, weight_decay=0.001)
 
@@ -89,12 +91,12 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
             # print(t_pred)
             # print(p_pred)
             # print(outputs)
-            # loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=outputs,
-            #                  uncensored_mean=uncensored_mean, censored_mean=censored_mean,
-            #                  batch_losses_first=batch_losses_first,
-            #                  batch_losses_second=batch_losses_second,
-            #                  batch_losses_third=batch_losses_third)
-            loss = ratio.RATIO(y=outputs, y_hat=t_pred)
+            loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=outputs,
+                             uncensored_mean=uncensored_mean, censored_mean=censored_mean,
+                             batch_losses_first=batch_losses_first,
+                             batch_losses_second=batch_losses_second,
+                             batch_losses_third=batch_losses_third)
+            # loss = ratio.RATIO(y=outputs, y_hat=t_pred)
             # # print(f'loss: {loss}')
 
             # backward
@@ -128,6 +130,9 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
 
         print(
             f'epoch: {epoch}, loss: {(epoch_loss / len(train_dataset))}, censor: {censor_count}, uncensor: {uncensor_count}, mean_p_pred_uncensored: {mean_p_pred_uncensored}, mean_p_pred_censored: {mean_p_pred_censored}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
+        # for RATIO loss
+        # print(
+            # f'epoch: {epoch}, loss: {(epoch_loss / len(train_dataset))}, censor: {censor_count}, uncensor: {uncensor_count}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
         print(f'first_loss: {batch_losses_first}')
         print(f'second_loss: {batch_losses_second}')
         print(f'third_loss: {batch_losses_third}')
@@ -155,7 +160,7 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
     uncensored_idx = Dataset.is_uncensored(val_dataset.y).flatten().detach().numpy()
     # print(f'uncensored_idx shape: {uncensored_idx.shape}')
     events = list(uncensored_idx)
-    # print(f'events: {events}')
+    print(f'events: {events}')
     print(f'events_obs_uncensored: {events_obs_uncensored}')
     print(f't_pred_uncensored: {t_pred_uncensored}')
     print(f'events: {events}')
@@ -168,6 +173,17 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
     print('-------------------------------------------------------------')
     print(f'Concordance index: {ci_lifelines(events_obs, preds, events)}')
 
+    # For RATIO loss
+    # print(f'events_obs_uncensored: {events_obs_uncensored}')
+    # print(f't_pred_uncensored: {t_pred_uncensored}')
+    # print(f'events: {events}')
+    # print(f'coef1: {coef1}, coef2: {coef2}, loss: {(epoch_loss / len(train_dataset))}, Concordance index: {ci_lifelines(events_obs, preds, events)}')
+    # print(
+    #     f'epoch: {epoch}, loss: {(epoch_loss / len(train_dataset))}, censor: {censor_count}, uncensor: {uncensor_count},'
+    #     f't_pred_uncensored_mean: {np.mean(t_pred_uncensored)}, t_pred_censored_mean: {np.mean(t_pred_censored)},'
+    #     f't_real_uncensored_mean: {np.mean(events_obs_uncensored)}, t_real_censored_mean: {np.mean(events_obs_censored)}')
+    # print('-------------------------------------------------------------')
+    # print(f'Concordance index: {ci_lifelines(events_obs, preds, events)}')
 
 
 

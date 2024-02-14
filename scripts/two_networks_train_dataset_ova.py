@@ -15,4 +15,4 @@ if __name__ == '__main__':
     for coef1 in coef1_grid:
         for coef2 in coef2_grid:
             # print(f'coef1: {coef1}, coef2: {coef2}')
-            two_networks.train_model(train_dataset, val_dataset, 1.0, 1000000.0)
+            two_networks.train_model(train_dataset, val_dataset, 1.0, 1.0)
