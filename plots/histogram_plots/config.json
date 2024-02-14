@@ -1,0 +1,38 @@
+{
+  "learning_rate": 0.0001,
+  "batch_size": 64,
+  "num_epochs": 2500,
+  "weight_decay": 0.001,
+  "optimizer": "adam",
+  "tasks": {
+    "do_train": true,
+    "do_eval": true,
+    "show_logs": true,
+    "save_model": true,
+    "do_plot": true
+  },
+  "datasets_names": [
+    "ova"
+  ],
+  "models_names": [
+    "two_networks",
+    "time_neural_network"
+  ],
+  "losses_names": [
+    "my_loss",
+    "my_loss_no_sigmoid",
+    "ratio",
+    "tobit"
+  ],
+  "resume_from_checkpoint": false,
+  "models_output": {
+    "two_networks": ["time", "probability"],
+    "time_neural_network": ["time"]
+  },
+  "losses_input": {
+    "my_loss": ["time", "probability"],
+    "my_loss_no_sigmoid": ["time", "probability"],
+    "tobit": ["time"],
+    "ratio": ["time"]
+  }
+}

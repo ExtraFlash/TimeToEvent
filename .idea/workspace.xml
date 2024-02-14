@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01e84f11-e6e3-443d-9488-fa1ae0851ba5" name="Changes" comment="Added 2 networks architecture">
-      <change beforePath="$PROJECT_DIR$/utils/two_networks.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/two_networks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/models/two_networks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plots/histogram_plots/config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plots/histogram_plots/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/my_loss.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/my_loss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/my_loss_no_sigmoid.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/my_loss_no_sigmoid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/ratio.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/ratio.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,13 +61,13 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/Or Shkuri/PycharmProjects/data_directed_samples-main",
+    "last_opened_file_path": "C:/Users/Or/PycharmProjects/TimeToEvent",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -194,7 +200,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
+        <option value="bundled-python-sdk-50da183f06c8-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13135.95" />
       </set>
     </attachedChunks>
   </component>

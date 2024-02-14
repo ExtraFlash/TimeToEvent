@@ -6,7 +6,7 @@ import math
 
 
 class MyLoss(nn.Module):
-    def __init__(self, coef1, coef2):
+    def __init__(self, coef1=1.0, coef2=1.0):
         super(MyLoss, self).__init__()
         self.coef1 = coef1
         self.coef2 = coef2

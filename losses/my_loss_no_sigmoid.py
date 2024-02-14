@@ -5,9 +5,9 @@ import torch.nn.functional as f
 import math
 
 
-class MyLoss(nn.Module):
-    def __init__(self, coef1, coef2):
-        super(MyLoss, self).__init__()
+class MyLossNoSigmoid(nn.Module):
+    def __init__(self, coef1=1.0, coef2=1.0):
+        super(MyLossNoSigmoid, self).__init__()
         self.coef1 = coef1
         self.coef2 = coef2
 

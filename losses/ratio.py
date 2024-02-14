@@ -1,9 +1,17 @@
 import torch.nn.functional as f
 import torch
+import torch.nn as nn
 import numpy as np
 from sklearn.linear_model import LinearRegression
 import pandas as pd
-import RATIO
+
+
+class RATIO(nn.Module):
+    def __init__(self):
+        super(RATIO, self).__init__()
+
+    def forward(self, t_pred, y_true):
+        return ratio_loss(y_true, t_pred)
 
 
 def calculate_tau(y_censored):
@@ -33,7 +41,7 @@ def calculate_tau(y_censored):
     return float(tau)
 
 
-def RATIO(y, y_hat):
+def ratio_loss(y, y_hat):
     """
     RATIO loss implementation, this loss is implemented with the MSE loss, but it can be changed to any other loss function
     :param y: real TTE
