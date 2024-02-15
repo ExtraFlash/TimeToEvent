@@ -6,23 +6,19 @@
   "optimizer": "adam",
   "tasks": {
     "do_train": true,
-    "do_eval": true,
     "show_logs": true,
     "save_model": true,
+    "save_results": true,
     "do_plot": true
   },
   "datasets_names": [
     "ova"
   ],
   "models_names": [
-    "two_networks",
-    "time_neural_network"
+    "two_networks"
   ],
   "losses_names": [
-    "my_loss",
-    "my_loss_no_sigmoid",
-    "ratio",
-    "tobit"
+    "my_loss_no_sigmoid"
   ],
   "resume_from_checkpoint": false,
   "models_output": {
