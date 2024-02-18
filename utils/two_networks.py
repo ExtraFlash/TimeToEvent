@@ -13,8 +13,9 @@ import matplotlib.pyplot as plt
 from datasets.dataset_real import RealDataset as Dataset
 from models.probability_neural_network import ProbabilityNetwork
 from models.time_neural_network import TimeNetwork
+from models.two_networks import TwoNetworks
 from losses.my_loss import MyLoss as Loss
-from losses.my_loss_no_sigmoid import MyLoss as LossNoSigmoid
+from losses.my_loss_no_sigmoid import MyLossNoSigmoid as LossNoSigmoid
 from lifelines.utils import concordance_index as ci_lifelines
 from losses import ratio
 
@@ -59,7 +60,7 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
 
     n_features = train_dataset.X.shape[1]
     learning_rate = 0.0001
-    num_epochs = 3000
+    num_epochs = 2500
     batch_size = 64
     # batch_size = len(train_dataset.X)  # 286
 
@@ -69,10 +70,13 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
     # define the model
     prob_model = ProbabilityNetwork(n_features)
     time_model = TimeNetwork(n_features)
+    # two_networks_model = TwoNetworks(n_features)
     # criterion = Loss(coef1=coef1, coef2=coef2)
     criterion = LossNoSigmoid(coef1=coef1, coef2=coef2)
+    # criterion_ratio = ratio.RATIO()
     prob_optimizer = torch.optim.Adam(prob_model.parameters(), lr=learning_rate, weight_decay=0.001)
     time_optimizer = torch.optim.Adam(time_model.parameters(), lr=learning_rate, weight_decay=0.001)
+    # optimizer = torch.optim.Adam(two_networks_model.parameters(), lr=learning_rate, weight_decay=0.001)
 
     for epoch in range(num_epochs):
         batch_losses_first = []
@@ -88,6 +92,7 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
             uncensor_count = torch.sum(Dataset.is_uncensored(outputs)).item()
             t_pred = time_model(inputs)
             p_pred = prob_model(inputs)
+            # t_pred, p_pred = two_networks_model(inputs)
             # print(t_pred)
             # print(p_pred)
             # print(outputs)
@@ -96,13 +101,16 @@ def train_model(train_dataset, val_dataset, coef1, coef2):
                              batch_losses_first=batch_losses_first,
                              batch_losses_second=batch_losses_second,
                              batch_losses_third=batch_losses_third)
-            # loss = ratio.RATIO(y=outputs, y_hat=t_pred)
+            # loss = criterion_ratio(t_pred=t_pred,
+            #                        y_true=outputs)
             # # print(f'loss: {loss}')
 
             # backward
             prob_optimizer.zero_grad()
             time_optimizer.zero_grad()
+            # optimizer.zero_grad()
             loss.backward()
+            # optimizer.step()
             prob_optimizer.step()
             time_optimizer.step()
             # print(f'p_pred: {p_pred}')
