@@ -9,7 +9,8 @@
     "show_logs": true,
     "save_model": true,
     "save_results": true,
-    "do_plot": true
+    "do_plot": true,
+    "do_plot_losses": true
   },
   "datasets_names": [
     "ova"
@@ -21,14 +22,33 @@
     "my_loss_no_sigmoid"
   ],
   "resume_from_checkpoint": false,
-  "models_output": {
-    "two_networks": ["time", "probability"],
-    "time_neural_network": ["time"]
+  "models_characteristics": {
+    "time_neural_network": {
+      "model_output": ["time"]
+    },
+    "two_networks": {
+      "model_output": ["time", "probability"]
+    },
+    "probability_to_time_network": {
+      "model_output": ["time", "probability"]
+    }
   },
-  "losses_input": {
-    "my_loss": ["time", "probability"],
-    "my_loss_no_sigmoid": ["time", "probability"],
-    "tobit": ["time"],
-    "ratio": ["time"]
+  "losses_characteristics": {
+    "my_loss": {
+      "loss_input": ["time", "probability"],
+      "losses_amount": 3
+    },
+    "my_loss_no_sigmoid": {
+      "loss_input": ["time", "probability"],
+        "losses_amount": 3
+    },
+    "tobit": {
+      "loss_input": ["time"],
+        "losses_amount": 2
+    },
+    "ratio": {
+      "loss_input": ["time"],
+        "losses_amount": 2
+    }
   }
 }

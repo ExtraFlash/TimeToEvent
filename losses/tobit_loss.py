@@ -8,7 +8,8 @@ class TobitLoss(nn.Module):
     def __init__(self):
         super(TobitLoss, self).__init__()
 
-    def forward(self, t_pred, y_true):
+    def forward(self, t_pred, y_true,
+                cumulative_losses=None, cumulative_amounts=None):
         # calculate tobit regression loss
         uncensored_idx = Dataset.is_uncensored(y_true)
         censored_idx = Dataset.is_censored(y_true)
@@ -19,6 +20,12 @@ class TobitLoss(nn.Module):
         if any(uncensored_idx):
             loss_uncensored += f.mse_loss(t_pred[uncensored_idx],
                                           Dataset.get_time(y_true)[uncensored_idx].view(-1, 1), reduction='mean')
+            if cumulative_losses is not None:
+                with torch.no_grad():
+                    cumulative_losses[0] += sum(uncensored_idx) * f.mse_loss(t_pred[uncensored_idx],
+                                                                             Dataset.get_time(y_true)[uncensored_idx].view(-1, 1),
+                                                                             reduction='mean')
+                    cumulative_amounts[0] += sum(uncensored_idx)
         if any(censored_idx):
             loss_uncensored += f.mse_loss(t_pred[censored_idx],
                                           Dataset.get_time(y_true)[censored_idx].view(-1, 1), reduction='mean')

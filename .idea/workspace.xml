@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01e84f11-e6e3-443d-9488-fa1ae0851ba5" name="Changes" comment="Added 2 networks architecture">
+    <list default="true" id="01e84f11-e6e3-443d-9488-fa1ae0851ba5" name="Changes" comment="Added config file and general script for plotting results">
+      <change afterPath="$PROJECT_DIR$/models/probability_to_time_network.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/plots/histogram_plots/grid_search.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/my_loss_no_sigmoid.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/my_loss_no_sigmoid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/ratio.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/ratio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/losses/tobit_loss.py" beforeDir="false" afterPath="$PROJECT_DIR$/losses/tobit_loss.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plots/histogram_plots/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/plots/histogram_plots/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/plots/histogram_plots/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/plots/histogram_plots/utils.py" afterDir="false" />
     </list>
@@ -33,43 +38,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.debugging.executor": "Run",
-    "Python.full_network_train_dataset_ova (1).executor": "Run",
-    "Python.full_network_train_dataset_ova.executor": "Run",
-    "Python.load_all_datasets.executor": "Run",
-    "Python.load_all_datasets_with_lifetimes.executor": "Run",
-    "Python.my_loss.executor": "Run",
-    "Python.ratio.executor": "Run",
-    "Python.real_neural_network.executor": "Run",
-    "Python.script.executor": "Run",
-    "Python.show_histogram.executor": "Run",
-    "Python.simulation_neural_network.executor": "Run",
-    "Python.surv_set.executor": "Run",
-    "Python.test.executor": "Run",
-    "Python.to_delete.executor": "Run",
-    "Python.to_delete_again.executor": "Run",
-    "Python.two_networks.executor": "Run",
-    "Python.two_networks_train_dataset_ova.executor": "Run",
-    "Python.utils.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/Or Shkuri/PycharmProjects/data_directed_samples-main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.debugging.executor&quot;: &quot;Run&quot;,
+    &quot;Python.full_network_train_dataset_ova (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.full_network_train_dataset_ova.executor&quot;: &quot;Run&quot;,
+    &quot;Python.grid_search.executor&quot;: &quot;Run&quot;,
+    &quot;Python.load_all_datasets.executor&quot;: &quot;Run&quot;,
+    &quot;Python.load_all_datasets_with_lifetimes.executor&quot;: &quot;Run&quot;,
+    &quot;Python.my_loss.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ratio.executor&quot;: &quot;Run&quot;,
+    &quot;Python.real_neural_network.executor&quot;: &quot;Run&quot;,
+    &quot;Python.script.executor&quot;: &quot;Run&quot;,
+    &quot;Python.show_histogram.executor&quot;: &quot;Run&quot;,
+    &quot;Python.simulation_neural_network.executor&quot;: &quot;Run&quot;,
+    &quot;Python.surv_set.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.to_delete.executor&quot;: &quot;Run&quot;,
+    &quot;Python.to_delete_again.executor&quot;: &quot;Run&quot;,
+    &quot;Python.two_networks.executor&quot;: &quot;Run&quot;,
+    &quot;Python.two_networks_train_dataset_ova.executor&quot;: &quot;Run&quot;,
+    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Or Shkuri/PycharmProjects/TimeToEvent&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Python.utils">
-    <configuration name="debugging" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Or Shkuri\PycharmProjects\TimeToEvent\plots\histogram_plots" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.grid_search">
+    <configuration name="grid_search" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TimeToEvent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -78,12 +90,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/scripts" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/plots/histogram_plots" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scripts/debugging.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plots/histogram_plots/grid_search.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -92,7 +104,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="test (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TimeToEvent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -101,12 +113,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/study" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/plots/histogram_plots" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/study/script.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plots/histogram_plots/test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -115,7 +127,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="to_delete_again" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TimeToEvent" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -124,12 +136,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/test.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/to_delete_again.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -186,10 +198,10 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.grid_search" />
+        <item itemvalue="Python.test (1)" />
         <item itemvalue="Python.utils" />
-        <item itemvalue="Python.script" />
-        <item itemvalue="Python.test" />
-        <item itemvalue="Python.debugging" />
+        <item itemvalue="Python.to_delete_again" />
         <item itemvalue="Python.two_networks_train_dataset_ova" />
       </list>
     </recent_temporary>
@@ -197,7 +209,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-5a2391486177-2887949eec09-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.13763.11" />
+        <option value="bundled-python-sdk-d68999036c7f-b11f5e8da5ad-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.14475.56" />
       </set>
     </attachedChunks>
   </component>
@@ -217,6 +229,13 @@
       <workItem from="1706773439900" duration="722000" />
       <workItem from="1707392307762" duration="697000" />
       <workItem from="1707397188013" duration="19707000" />
+      <workItem from="1708243019926" duration="39256000" />
+      <workItem from="1708415889479" duration="14353000" />
+      <workItem from="1710079753250" duration="12252000" />
+      <workItem from="1710404619314" duration="47000" />
+      <workItem from="1710411625783" duration="3022000" />
+      <workItem from="1710752667724" duration="843000" />
+      <workItem from="1715850108209" duration="2508000" />
     </task>
     <task id="LOCAL-00001" summary="First">
       <option name="closed" value="true" />
@@ -250,7 +269,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707730341189</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added config file and general script for plotting results">
+      <option name="closed" value="true" />
+      <created>1708009224687</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1708009224687</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -260,22 +287,25 @@
     <MESSAGE value="First" />
     <MESSAGE value="Second" />
     <MESSAGE value="Added 2 networks architecture" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added 2 networks architecture" />
+    <MESSAGE value="Added config file and general script for plotting results" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added config file and general script for plotting results" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/TimeToEvent$ratio.coverage" NAME="ratio Coverage Results" MODIFIED="1706454640920" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/losses" />
+    <SUITE FILE_PATH="coverage/TimeToEvent$grid_search.coverage" NAME="grid_search Coverage Results" MODIFIED="1710411785763" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/plots/histogram_plots" />
     <SUITE FILE_PATH="coverage/TimeToEvent$my_loss.coverage" NAME="my_loss Coverage Results" MODIFIED="1707406988310" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/losses" />
     <SUITE FILE_PATH="coverage/TimeToEvent$load_all_datasets_with_lifetimes.coverage" NAME="load_all_datasets_with_lifetimes Coverage Results" MODIFIED="1705945207551" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/TimeToEvent$test.coverage" NAME="test Coverage Results" MODIFIED="1708005781957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/TimeToEvent$two_networks.coverage" NAME="two_networks Coverage Results" MODIFIED="1707644099868" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/TimeToEvent$script.coverage" NAME="script Coverage Results" MODIFIED="1708006074374" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/study" />
     <SUITE FILE_PATH="coverage/TimeToEvent$full_network_train_dataset_ova.coverage" NAME="full_network_train_dataset_ova Coverage Results" MODIFIED="1707398291279" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
-    <SUITE FILE_PATH="coverage/TimeToEvent$to_delete_again.coverage" NAME="to_delete_again Coverage Results" MODIFIED="1706462330492" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/TimeToEvent$to_delete_again.coverage" NAME="to_delete_again Coverage Results" MODIFIED="1708340999220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TimeToEvent$surv_set.coverage" NAME="full_network_train_dataset_ova Coverage Results" MODIFIED="1706438712162" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
-    <SUITE FILE_PATH="coverage/TimeToEvent$utils.coverage" NAME="utils Coverage Results" MODIFIED="1708009110026" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/plots/histogram_plots" />
-    <SUITE FILE_PATH="coverage/TimeToEvent$two_networks_train_dataset_ova.coverage" NAME="two_networks_train_dataset_ova Coverage Results" MODIFIED="1707648919375" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
+    <SUITE FILE_PATH="coverage/TimeToEvent$utils.coverage" NAME="utils Coverage Results" MODIFIED="1710082173716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/plots/histogram_plots" />
+    <SUITE FILE_PATH="coverage/TimeToEvent$two_networks_train_dataset_ova.coverage" NAME="two_networks_train_dataset_ova Coverage Results" MODIFIED="1708243755575" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/TimeToEvent$full_network_train_dataset_ova__1_.coverage" NAME="full_network_train_dataset_ova (1) Coverage Results" MODIFIED="1706441365127" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/TimeToEvent$debugging.coverage" NAME="debugging Coverage Results" MODIFIED="1708003054191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
+    <SUITE FILE_PATH="coverage/TimeToEvent$test__1_.coverage" NAME="test (1) Coverage Results" MODIFIED="1710148514362" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/plots/histogram_plots" />
     <SUITE FILE_PATH="coverage/TimeToEvent$real_neural_network.coverage" NAME="real_neural_network Coverage Results" MODIFIED="1706199615043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/models" />
   </component>
 </project>

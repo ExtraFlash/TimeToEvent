@@ -16,6 +16,7 @@ from datasets.dataset_real import RealDataset as Dataset
 from models.probability_neural_network import ProbabilityNetwork
 from models.time_neural_network import TimeNetwork
 from models.two_networks import TwoNetworks
+from models.probability_to_time_network import ProbabilityToTimeNetwork
 
 # losses
 from losses.my_loss import MyLoss
@@ -95,12 +96,14 @@ def get_model(config, model_name, n_features):
         return TwoNetworks(n_features)
     elif model_name == 'time_neural_network':
         return TimeNetwork(n_features)
+    elif model_name == 'probability_to_time_network':
+        return ProbabilityToTimeNetwork(n_features)
     else:
         raise ValueError('Model not found')
 
 
-def train_model(config_file, train_dataset, model, criterion,
-                dataset_name, model_name, loss_name):
+def train_model(config_file, identifier, train_dataset, val_dataset, model, criterion,
+                dataset_name, model_name, loss_name, coefficients=None):
     """
     Train the model
     :param config_file: path to the configuration file
@@ -108,7 +111,7 @@ def train_model(config_file, train_dataset, model, criterion,
     :param model: model
     :param critertion: loss function
     """
-    folder_path = f'{dataset_name}_{model_name}_{loss_name}'
+    folder_path = f'{dataset_name}_{model_name}_{loss_name}_{identifier}'
     with open(config_file, encoding='utf-8') as f:
         config = json.load(f)
     # load the configuration
@@ -119,6 +122,15 @@ def train_model(config_file, train_dataset, model, criterion,
     optimizer_name = config['optimizer']
     tasks = config['tasks']
     resume_from_checkpoint = config.get('resume_from_checkpoint', False)
+    losses_amount = config['losses_characteristics'][loss_name]['losses_amount']
+
+    train_epoch_losses = []  # list of lists, each list contains the corresponding losses for each epoch
+    for i in range(losses_amount):
+        train_epoch_losses.append([])
+
+    val_epoch_losses = []  # list of lists, each list contains the corresponding losses for each epoch
+    for i in range(losses_amount):
+        val_epoch_losses.append([])
 
     if optimizer_name == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
@@ -127,12 +139,12 @@ def train_model(config_file, train_dataset, model, criterion,
     if resume_from_checkpoint:
         checkpoint = torch.load(f'{folder_path}/checkpoint.pth')
         optimizer.load_state_dict(checkpoint['optim_state'])
-
+        loaded_epoch = checkpoint['epoch']
 
     y_train = train_dataset.y.numpy()
     is_output_time_probability = False
     # check if the model output is time and probability
-    if len(config["models_output"][model_name]) == 2:
+    if len(config['models_characteristics'][model_name]['model_output']) == 2:
         is_output_time_probability = True
         if resume_from_checkpoint:
             uncensored_mean = checkpoint['uncensored_mean']
@@ -142,29 +154,68 @@ def train_model(config_file, train_dataset, model, criterion,
             uncensored_mean = np.mean(y_train[y_train[:, 0] == 1][:, 1])
             # calculate the mean y value of the censored samples
             censored_mean = np.mean(y_train[y_train[:, 0] == 0][:, 1])
+
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    model.train()
     # train the model
     for epoch in range(num_epochs):
+        model.train()  # set the model to training model. because we call model.eval() in the validation loop
         censor_count = 0
         uncensor_count = 0
-        epoch_loss = 0.0
+        # epoch_loss = 0.0
+        epoch_cumulative_losses = []  # list where each element is a cumulative not normalized corresponding loss
+        for i in range(losses_amount):
+            epoch_cumulative_losses.append(0.0)
+        epoch_cumulative_amounts = []  # list where each element is a cumulative amount of corresponding samples to normalize the cumulative loss
+        for i in range(losses_amount):
+            epoch_cumulative_amounts.append(0)
+
         for i, (inputs, outputs) in enumerate(train_loader):
             censor_count = torch.sum(Dataset.is_censored(outputs)).item()
             uncensor_count = torch.sum(Dataset.is_uncensored(outputs)).item()
             if is_output_time_probability:
                 t_pred, p_pred = model(inputs)
                 loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=outputs,
-                                 uncensored_mean=uncensored_mean, censored_mean=censored_mean)
+                                 uncensored_mean=uncensored_mean, censored_mean=censored_mean, coefficients=coefficients,
+                                 cumulative_losses=epoch_cumulative_losses, cumulative_amounts=epoch_cumulative_amounts)
             else:
                 t_pred = model(inputs)
-                loss = criterion(t_pred, outputs)
+                loss = criterion(t_pred, outputs, coefficients=coefficients,
+                                 cumulative_losses=epoch_cumulative_losses, cumulative_amounts=epoch_cumulative_amounts)
             # backward
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            epoch_loss += loss.item()
+            # epoch_loss += outputs.shape[0] * loss.item()
+            # print(f'epoch_loss: {epoch_loss}')
+            # print(f'batch_losses_first: {np.sum(batch_losses_first)}')
+            # print(f'batch_losses_second: {np.sum(batch_losses_second)}')
+            # print(f'batch_losses_third: {np.sum(batch_losses_third)}')
+            # if forth_loss_train is not None:
+            #     print(f'batch_losses_forth: {np.sum(batch_losses_forth)}')
+        epoch_loss = sum(epoch_cumulative_losses[i] / epoch_cumulative_amounts[i] for i in range(losses_amount))
+        for i in range(losses_amount):
+            train_epoch_losses[i].append(epoch_cumulative_losses[i] / epoch_cumulative_amounts[i])
+        # validation loss
+        with torch.no_grad():
+            model.eval()
+            val_epoch_cumulative_losses = []  # list where each element is a cumulative not normalized corresponding loss
+            for i in range(losses_amount):
+                val_epoch_cumulative_losses.append(0.0)
+            val_epoch_cumulative_amounts = []  # list where each element is a cumulative amount of corresponding samples to normalize the cumulative loss
+            for i in range(losses_amount):
+                val_epoch_cumulative_amounts.append(0)
+            if is_output_time_probability:
+                val_t_pred, val_p_pred = model(val_dataset.X)
+                criterion(val_t_pred, val_p_pred, val_dataset.y, uncensored_mean, censored_mean, coefficients=coefficients,
+                          cumulative_losses=val_epoch_cumulative_losses, cumulative_amounts=val_epoch_cumulative_amounts)
+            else:
+                val_t_pred = model(val_dataset.X)
+                criterion(val_t_pred, val_dataset.y, coefficients=coefficients,
+                          cumulative_losses=val_epoch_cumulative_losses, cumulative_amounts=val_epoch_cumulative_amounts)
+            # update validation epoch losses
+            for i in range(losses_amount):
+                val_epoch_losses[i].append(val_epoch_cumulative_losses[i] / val_epoch_cumulative_amounts[i])
 
         if tasks.get('show_logs', False):
             if is_output_time_probability:
@@ -183,10 +234,27 @@ def train_model(config_file, train_dataset, model, criterion,
             print(f'dataset: {dataset_name}, model: {model_name}, loss: {loss_name}')
             if is_output_time_probability:
                 print(
-                    f'epoch: {epoch}, loss: {(epoch_loss / len(train_dataset))}, censor: {censor_count}, uncensor: {uncensor_count}, mean_p_pred_uncensored: {mean_p_pred_uncensored}, mean_p_pred_censored: {mean_p_pred_censored}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
+                    f'epoch: {epoch}, loss: {epoch_loss}, censor: {censor_count}, uncensor: {uncensor_count}, mean_p_pred_uncensored: {mean_p_pred_uncensored}, mean_p_pred_censored: {mean_p_pred_censored}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
             else:
                 print(
-                    f'epoch: {epoch}, loss: {(epoch_loss / len(train_dataset))}, censor: {censor_count}, uncensor: {uncensor_count}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
+                    f'epoch: {epoch}, loss: {epoch_loss}, censor: {censor_count}, uncensor: {uncensor_count}, mean_t_pred_uncensored: {mean_t_pred_uncensored}, mean_t_pred_censored: {mean_t_pred_censored}, t_real_mean_uncensored: {t_real_mean_uncensored}, t_real_mean_censored: {t_real_mean_censored}')
+            for i in range(losses_amount):
+                print(f'loss_{i}: {train_epoch_losses[i][-1]}')
+
+    if tasks.get('do_plot_losses', False):
+        # make plot for each loss
+        for i in range(losses_amount):
+            plt.plot(train_epoch_losses[i], label='train')
+            plt.plot(val_epoch_losses[i], label='val')
+            plt.title(f'Loss {i}')
+            plt.legend(loc='upper right')
+
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
+            plt.savefig(f'{folder_path}/loss_{i}.png')
+            plt.clf()
+
     if tasks.get('save_model', False):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
@@ -202,12 +270,20 @@ def train_model(config_file, train_dataset, model, criterion,
                 'model_state': model.state_dict(),
                 'optim_state': optimizer.state_dict()
             }
+        # add the epoch to the checkpoint
+        if resume_from_checkpoint:
+            checkpoint['epoch'] = loaded_epoch + epoch
+        else:
+            checkpoint['epoch'] = epoch
         torch.save(checkpoint, f'{folder_path}/checkpoint.pth')
-    return model
+    if len(config['models_characteristics'][model_name]['model_output']) == 2:
+        return model, uncensored_mean, censored_mean
+    else:
+        return model
 
 
 def plot_model(config_file, val_dataset, model, criterion,
-               dataset_name, model_name, loss_name,
+               dataset_name, model_name, loss_name, identifier='',
                uncensored_mean=None, censored_mean=None):
     """
     Plot the model
@@ -215,12 +291,12 @@ def plot_model(config_file, val_dataset, model, criterion,
     :param val_dataset: validation dataset
     :param model: model
     """
-    folder_path = f'{dataset_name}_{model_name}_{loss_name}'
+    folder_path = f'{dataset_name}_{model_name}_{loss_name}_{identifier}'
     with open(config_file, encoding='utf-8') as f:
         config = json.load(f)
     tasks = config['tasks']
 
-    model.eval()
+    model.eval()  # set the model to evaluation mode
 
     y_true = val_dataset.y
 
@@ -231,7 +307,7 @@ def plot_model(config_file, val_dataset, model, criterion,
     events_obs_censored = val_dataset.y[censored_idx][:, 1].flatten().detach().numpy()
 
     # check if the model output is time and probability
-    if config['models_output'][model_name] == 2:
+    if len(config['models_characteristics'][model_name]['model_output']) == 2:
         t_pred, p_pred = model(val_dataset.X)
     else:
         t_pred = model(val_dataset.X)
@@ -245,13 +321,12 @@ def plot_model(config_file, val_dataset, model, criterion,
     events = list(uncensored_idx)
 
     ci = ci_lifelines(events_obs, preds, events)
-    loss = criterion(t_pred, val_dataset.y).item()
     # check if the model output is time and probability
-    if config['models_output'][model_name] == 2:
+    if len(config['models_characteristics'][model_name]['model_output']) == 2:
         loss = criterion(t_pred=t_pred, p_pred=p_pred, y_true=y_true,
                          uncensored_mean=uncensored_mean, censored_mean=censored_mean).item()
     else:
-        loss = criterion(t_pred, y_true)
+        loss = criterion(t_pred, y_true).item()
     # save the concordance index
     if tasks.get('save_results', False):
         with open(f'{folder_path}/results.txt', 'w') as f:
@@ -266,12 +341,11 @@ def plot_model(config_file, val_dataset, model, criterion,
         plt.savefig(f'{folder_path}/plot.png')
 
 
-def run_config(config_file):
+def run_config(config_file, identifier='', coefficients=None):
     """
     Run the configuration file
     :param config_file: path to the configuration file
     """
-    models = {}
 
     with open(config_file, encoding='utf-8') as f:
         config = json.load(f)
@@ -287,37 +361,52 @@ def run_config(config_file):
         df, ref = loader.load_dataset(ds_name=dataset_name).values()
         train_dataset, val_dataset, test_dataset = train_val_test_split(df)
         n_features = train_dataset.X.shape[1]
+        # count number of censored and uncensored samples in the validation set
+        uncensored_count = torch.sum(Dataset.is_uncensored(val_dataset.y)).item()
+        censored_count = torch.sum(Dataset.is_censored(val_dataset.y)).item()
+        # print(f'uncensored count: {uncensored_count}, censored count: {censored_count}')
+        # print(f'val_dataset set size: {val_dataset.X.shape[0]}')
 
         for loss_name in losses_names:
             criterion = get_loss(loss_name)
-            loss_input = config['losses_input'][loss_name]
+            loss_input = config['losses_characteristics'][loss_name]['loss_input']
 
             for model_name in models_names:
                 print(f'dataset: {dataset_name}, model: {model_name}, loss: {loss_name}')
-                model_output = config['models_output'][model_name]
+                model_output = config['models_characteristics'][model_name]['model_output']
                 # if the loss and model are not compatible
                 if loss_input != model_output:
                     continue
                 # use dictionary for models, so we don't train the same model twice
-                if model_name not in models:
-                    model = get_model(config, model_name, n_features)
-                    if config.get('resume_from_checkpoint', False):
-                        checkpoint = torch.load(f'{dataset_name}_{model_name}_{loss_name}/checkpoint.pth')
-                        model.load_state_dict(checkpoint['model_state'])
-                    if tasks.get('do_train', False):
-                        model = train_model(config_file, train_dataset, model, criterion,
+                model = get_model(config, model_name, n_features)
+                if config.get('resume_from_checkpoint', False):
+                    checkpoint = torch.load(f'{dataset_name}_{model_name}_{loss_name}_{identifier}/checkpoint.pth')
+                    model.load_state_dict(checkpoint['model_state'])
+                    # get the uncensored and censored samples if output is time and probability
+                    if len(config['models_characteristics'][model_name]['model_output']) == 2:
+                        uncensored_mean = checkpoint['uncensored_mean']
+                        censored_mean = checkpoint['censored_mean']
+
+                if tasks.get('do_train', False):
+                    if len(config['models_characteristics'][model_name]['model_output']) == 2:
+                        model, uncensored_mean, censored_mean = train_model(config_file, identifier, train_dataset, val_dataset,
+                                                                            model,
+                                                                            criterion,
+                                                                            dataset_name, model_name, loss_name,
+                                                                            coefficients=coefficients)
+                    else:
+                        model = train_model(config_file, identifier, train_dataset, val_dataset, model, criterion,
                                             dataset_name, model_name, loss_name)
-                    models[model_name] = model
-                else:
-                    model = models[model_name]
                 # Here we got the trained model, loss and dataset
                 # now we can perform the tasks specified in the config
                 if tasks.get('do_plot', False):
-                    plot_model(config_file, val_dataset, model, criterion,
-                               dataset_name, model_name, loss_name)
+                    if len(config['models_characteristics'][model_name]['model_output']) == 2:
+                        plot_model(config_file, val_dataset, model, criterion,
+                                   dataset_name, model_name, loss_name, identifier, uncensored_mean, censored_mean)
+                    else:
+                        plot_model(config_file, val_dataset, model, criterion,
+                                   dataset_name, model_name, loss_name, identifier)
 
 
 if __name__ == '__main__':
     run_config('config.json')
-
-
